@@ -26,7 +26,7 @@ import com.example.demo.dto.Clients;
 public class sendMessageOnRoute {
 	 private static final TimeFormatter TIME_FORMATTER = new AbsoluteTimeFormatter();
 	
-	public void sendMessage(String msg, Clients c) {
+	public void sendMessage(Clients c) {
 		  SMPPSession session = new SMPPSession();
 	        try {
 	            System.out.println("Connecting");
@@ -35,13 +35,13 @@ public class sendMessageOnRoute {
 
 	            try {
 	                String messageId = session.submitShortMessage("CMT",
-	                    TypeOfNumber.INTERNATIONAL, NumberingPlanIndicator.UNKNOWN, "notice",
-	                    TypeOfNumber.INTERNATIONAL, NumberingPlanIndicator.UNKNOWN, "91917009073863",
+	                    TypeOfNumber.INTERNATIONAL, NumberingPlanIndicator.UNKNOWN, c.getSender_details(),
+	                    TypeOfNumber.INTERNATIONAL, NumberingPlanIndicator.UNKNOWN, c.getContacts(),
 	                    new ESMClass(), (byte)0, (byte)1,  TIME_FORMATTER.format(new Date()), null,
 	                    new RegisteredDelivery(SMSCDeliveryReceipt.DEFAULT), (byte)0, new GeneralDataCoding(Alphabet.ALPHA_DEFAULT, MessageClass.CLASS1, false), (byte)0,
-	                    msg.getBytes());
+	                    c.getMessage().getBytes());
 	                System.out.println("Message submitted, message_id is {}"+messageId);
-	                System.out.println("Message details................."+msg);
+	                System.out.println("Message details................."+c.getMessage());
 	                //Update Client Status
 	                new ClientManager().updateStatusById(c);
 	            } catch (PDUException e) {

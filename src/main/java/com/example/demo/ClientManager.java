@@ -52,7 +52,7 @@ public class ClientManager {
 		
 	}
 	
-	public Clients getPendingMessages() {
+	public Clients getAMessage() {
 		Clients c = new Clients();
 		Connection conn=null;
 		Statement pstmt=null;
@@ -63,10 +63,11 @@ public class ClientManager {
 			pstmt = conn.createStatement();
 			rs = pstmt.executeQuery(sql);
 			while(rs.next()) {
-				
 				c.setId(rs.getInt("id"));
 				c.setSender_details(rs.getString("sender_details"));
 				c.setMessage(rs.getString("message"));
+				c.setContacts(rs.getString("contacts"));
+				c.setSubmission_date(rs.getString("submission_date"));
 				
 			}
 		} catch(Exception e) {
@@ -85,6 +86,47 @@ public class ClientManager {
 			e2.printStackTrace();
 			}
 			return c;
+		} 
+	}
+	
+	public List<Clients> getPendingMessages() {
+		List<Clients> list = new ArrayList<Clients>();
+		
+		Connection conn=null;
+		Statement pstmt=null;
+		ResultSet rs = null;
+		try {
+			conn = DbConnection.getInstance().getConnection();
+			String sql = "select * from clients where status = 1";
+			pstmt = conn.createStatement();
+			rs = pstmt.executeQuery(sql);
+			while(rs.next()) {
+				Clients c = new Clients();
+				
+				c.setId(rs.getInt("id"));
+				c.setSender_details(rs.getString("sender_details"));
+				c.setMessage(rs.getString("message"));
+				c.setContacts(rs.getString("contacts"));
+				c.setSubmission_date(rs.getString("submission_date"));
+				
+				list.add(c);
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if(conn!=null) {
+					conn.close();
+				}if(rs!=null) {
+					rs.close();
+				}if(pstmt!=null) {
+					pstmt.close();
+				}
+			} catch (Exception e2) {
+				// TODO: handle exception
+			e2.printStackTrace();
+			}
+			return list;
 		} 
 	}
 	

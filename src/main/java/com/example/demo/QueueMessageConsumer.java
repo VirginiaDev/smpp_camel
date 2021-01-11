@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.jms.Connection;
 import javax.jms.Destination;
@@ -59,26 +61,28 @@ public class QueueMessageConsumer implements MessageListener{
 
 	        public void run() {
 	            try {
-	            	connection.start();
-	                Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+	            	//connection.start();
+	                //Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 	                System.out.println("22222222===========================================");
-	                for (int i = 0; i < 20; i++) {
-	                	Clients client = new ClientManager().getPendingMessages();
+	                for (int i = 0; i < 1; i++) {
+	                	Clients client = new ClientManager().getAMessage();
 	                	if(client.getSender_details()==null) {
 	                		System.out.println("=======================No New Message Found======================");
 	                	} else {
-                				Destination d = session.createQueue(client.getSender_details());
+	                		System.out.println("==================="+client.getSender_details());
+	                		new sendMessageOnRoute().sendMessage(client);
+                				//Destination d = session.createQueue(client.getSender_details());
 	                			
-			                	MessageConsumer consumer =  session.createConsumer(d);
-			                	 Message message = consumer.receive(2000);
-			     	        	    if (message == null){
+			                	//MessageConsumer consumer =  session.createConsumer(d);
+			                	 //Message message = consumer.receive(2000);
+			     	        	    //if (message == null){
 			     	        	    	//new GetPendingQueues().getAllPendingQueues();
-			     	        	    }
+			     	        	    //}
 
-			     	        	    if (message instanceof TextMessage) {
-			     	        	        TextMessage textMessage = (TextMessage) message;
-			     	        	        System.out.println("Incomming Message: '" + textMessage.getText() + "'");  
-			     	        	       new sendMessageOnRoute().sendMessage(textMessage.getText(), client);
+			     	        	    //if (message instanceof TextMessage) {
+			     	        	        //TextMessage textMessage = (TextMessage) message;
+			     	        	        //System.out.println("Incomming Message: '" + textMessage.getText() + "'");  
+			     	        	       //new sendMessageOnRoute().sendMessage(client);
 			     	        	    }
 	                			
 	                		}
@@ -105,10 +109,9 @@ public class QueueMessageConsumer implements MessageListener{
 //	     	        	    e.printStackTrace();
 //	     	        	  }
 //	     	        	}
-	                }
 
-	                session.close();
-	                connection.close();
+	                //session.close();
+	                //connection.close();
 	            } catch(Exception ex) {
 	                System.out.println("Run caught exception: " + ex.getMessage());
 	            } finally {
@@ -120,12 +123,14 @@ public class QueueMessageConsumer implements MessageListener{
 	    	
 	        ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(username, password, activeMqBrokerUri);
     	    PooledConnectionFactory pooledFactory = new PooledConnectionFactory(factory);
-	    	ExecutorService service = Executors.newFixedThreadPool(10);
+    	    ScheduledExecutorService service =
+    	    	    Executors.newSingleThreadScheduledExecutor();
 
-	    	for (int i = 0; i < 100; ++i) {
+
+	    	for (int i = 0; i < 1; ++i) {
 	    		
-	    	    service.execute(new Sender(pooledFactory.createConnection()));
-	    	    
+	    	    //service.execute(new Sender(pooledFactory.createConnection()));
+	    		service.scheduleAtFixedRate(new Sender(pooledFactory.createConnection()), 0, 10, TimeUnit.SECONDS);
     	    }
 	    	    
 //	        System.out.println("Sessio=============================================="+session);

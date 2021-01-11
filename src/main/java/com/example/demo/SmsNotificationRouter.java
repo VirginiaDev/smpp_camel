@@ -61,54 +61,54 @@ public class SmsNotificationRouter extends RouteBuilder {
 				.to("seda:newMessage");
 
 
-//		from("seda:newMessage?concurrentConsumers=20").routeId("smpp-sender").process(messageProcessor)
-//				.setHeader("CamelSmppDestAddr",simple("91${in.body.sender}"))
-//				.setBody(simple("${in.body.messageBody}"))
-//				.to("smpp://{{smpp.tr.systemid}}@{{smpp.tr.host}}:{{smpp.tr.port}}?password={{smpp.tr.password}}&enquireLinkTimer=3000&transactionTimer=5000&sourceAddrTon={{smpp.source.addr.ton}}&sourceAddrNpi={{smpp.source.addr.npi}}&destAddrTon={{smpp.dest.addr.ton}}&destAddrNpi={{smpp.dest.addr.npi}}&sourceAddr={{smpp.source.address}}");
+		from("seda:newMessage?concurrentConsumers=20").routeId("smpp-sender").process(messageProcessor)
+				.setHeader("CamelSmppDestAddr",simple("91${in.body.sender}"))
+				.setBody(simple("${in.body.messageBody}"))
+				.to("smpp://{{smpp.tr.systemid}}@{{smpp.tr.host}}:{{smpp.tr.port}}?password={{smpp.tr.password}}&enquireLinkTimer=3000&transactionTimer=5000&sourceAddrTon={{smpp.source.addr.ton}}&sourceAddrNpi={{smpp.source.addr.npi}}&destAddrTon={{smpp.dest.addr.ton}}&destAddrNpi={{smpp.dest.addr.npi}}&sourceAddr={{smpp.source.address}}");
 
-		String smppUriTemplate =
-				"smpp://Saless@182.18.144.246:8585"
-				+ "?password=Sales12"
-				+ "&systemType=cp"
-				+ "&enquireLinkTimer=3000"
-				+ "&typeOfNumber=1"
-				+ "&numberingPlanIndicator=1";
-
-		String smppUriProducer = smppUriTemplate + "&registeredDelivery=1";
-		String smppUriConsumer = smppUriTemplate;
-		
-		String dlq = 
-				"smpp://testing_account@182.18.144.246:8585"
-						+ "?password=Test12"
-						+ "&systemType=cp"
-						+ "&enquireLinkTimer=3000"
-						+ "&typeOfNumber=1"
-						+ "&numberingPlanIndicator=1";
+//		String smppUriTemplate =
+//				"smpp://Saless@182.18.144.246:8585"
+//				+ "?password=Sales12"
+//				+ "&systemType=cp"
+//				+ "&enquireLinkTimer=3000"
+//				+ "&typeOfNumber=1"
+//				+ "&numberingPlanIndicator=1";
+//
+//		String smppUriProducer = smppUriTemplate + "&registeredDelivery=1";
+//		String smppUriConsumer = smppUriTemplate;
+//		
+//		String dlq = 
+//				"smpp://testing_account@182.18.144.246:8585"
+//						+ "?password=Test12"
+//						+ "&systemType=cp"
+//						+ "&enquireLinkTimer=3000"
+//						+ "&typeOfNumber=1"
+//						+ "&numberingPlanIndicator=1";
 		
 		/**
 		 * This Camel route handles messages going out to the SMS world
 		 */
-		from("seda:newMessage?concurrentConsumers=20")
-			.errorHandler(deadLetterChannel(dlq))
-			.onException(SmppException.class)
-				.maximumRedeliveries(0)
-				.end()
-			.removeHeaders("CamelSmpp*")//In case it started as SMS elsewhere
-			.process(origin)
-			.process(destination)
-			.choice()
-				.when(blacklistedDestination)
-					.to(dlq)
-				.otherwise()
-					.process(sourceOverride)
-					.process(smppAddressing)
-					.throttle(throttleRequestsPerPeriod)
-						.timePeriodMillis(throttleTimePeriodMillis)
-					//.to("mock:foo")
-					.setBody(simple("The SMSC accepted the message"
-							+ " for 917009073863"
-							+ " and assigned SMPP ID: TEST"))
-					.to(smppUriProducer);
+//		from("seda:newMessage?concurrentConsumers=20")
+//			.errorHandler(deadLetterChannel(dlq))
+//			.onException(SmppException.class)
+//				.maximumRedeliveries(0)
+//				.end()
+//			.removeHeaders("CamelSmpp*")//In case it started as SMS elsewhere
+//			.process(origin)
+//			.process(destination)
+//			.choice()
+//				.when(blacklistedDestination)
+//					.to(dlq)
+//				.otherwise()
+//					.process(sourceOverride)
+//					.process(smppAddressing)
+//					.throttle(throttleRequestsPerPeriod)
+//						.timePeriodMillis(throttleTimePeriodMillis)
+//					//.to("mock:foo")
+//					.setBody(simple("The SMSC accepted the message"
+//							+ " for 917009073863"
+//							+ " and assigned SMPP ID: TEST"))
+//					.to(smppUriProducer);
 	}
 	
 	public static void main(String args[]) {

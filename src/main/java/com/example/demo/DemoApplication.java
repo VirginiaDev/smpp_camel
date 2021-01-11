@@ -20,7 +20,7 @@ import org.springframework.jms.core.JmsTemplate;
 public class DemoApplication {
 	public static void main(String[] args) throws JMSException {
 		
-		//ApplicationContext ctx =  SpringApplication.run(DemoApplication.class, args);
+		ApplicationContext ctx =  SpringApplication.run(DemoApplication.class, args);
 		
 		QueueMessageConsumer queueMsgListener = new QueueMessageConsumer(Constants.TEST_BROKER_URL, Constants.ADMIN,
                 Constants.ADMIN);
