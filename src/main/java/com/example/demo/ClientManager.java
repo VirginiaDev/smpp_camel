@@ -59,7 +59,9 @@ public class ClientManager {
 		ResultSet rs = null;
 		try {
 			conn = DbConnection.getInstance().getConnection();
-			String sql = "select * from clients where status = 1";
+			String sql = "SELECT c.id, c.sender_details, c.message, c.submission_date, c.contacts, r.name, r.ip_address, r.tx_port, "
+					+ "r.system_id, r.password, r.system_type FROM  clients c, "
+					+ "user u, route r WHERE c.user_name=u.user_name AND u.route_name=r.name AND c.status=1 ";
 			pstmt = conn.createStatement();
 			rs = pstmt.executeQuery(sql);
 			while(rs.next()) {
@@ -68,7 +70,11 @@ public class ClientManager {
 				c.setMessage(rs.getString("message"));
 				c.setContacts(rs.getString("contacts"));
 				c.setSubmission_date(rs.getString("submission_date"));
-				
+				c.setIpAddress(rs.getString("ip_address"));
+				c.setTxPort(rs.getString("tx_port"));
+				c.setSystemId(rs.getString("system_id"));
+				c.setPassword(rs.getString("password"));
+				c.setSystemType(rs.getString("system_type"));
 			}
 		} catch(Exception e) {
 			e.printStackTrace();

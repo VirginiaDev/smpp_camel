@@ -30,7 +30,11 @@ public class sendMessageOnRoute {
 		  SMPPSession session = new SMPPSession();
 	        try {
 	            System.out.println("Connecting");
-	            String systemId = session.connectAndBind("182.18.144.246", 8585, new BindParameter(BindType.BIND_TX, "test_account2", "Test34", "cp", TypeOfNumber.UNKNOWN, NumberingPlanIndicator.UNKNOWN, null));
+	            System.out.println("HostName==================================="+c.getIpAddress());
+	            System.out.println("systemId==================================="+c.getSystemId());
+	            System.out.println("Sender details============================="+c.getSender_details());
+	            System.out.println("Destination address========================"+c.getContacts());
+	            String systemId = session.connectAndBind(c.getIpAddress(), Integer.parseInt(c.getTxPort()), new BindParameter(BindType.BIND_TX, c.getSystemId(), c.getPassword(), c.getSystemType(), TypeOfNumber.UNKNOWN, NumberingPlanIndicator.UNKNOWN, null));
 	            System.out.println("Connected with SMSC with system id {}"+systemId);
 
 	            try {

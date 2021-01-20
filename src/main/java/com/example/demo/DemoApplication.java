@@ -22,8 +22,7 @@ public class DemoApplication {
 		
 		ApplicationContext ctx =  SpringApplication.run(DemoApplication.class, args);
 		
-		QueueMessageConsumer queueMsgListener = new QueueMessageConsumer(Constants.TEST_BROKER_URL, Constants.ADMIN,
-                Constants.ADMIN);
+		QueueMessageConsumer queueMsgListener = new QueueMessageConsumer();
 
 	    queueMsgListener.setDestinationName(Constants.TEST_QUEUE);
 		    

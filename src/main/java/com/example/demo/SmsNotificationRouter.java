@@ -1,7 +1,15 @@
 package com.example.demo;
 
+import com.example.demo.dto.Clients;
 import com.example.demo.dto.Message;
 import com.example.demo.processor.MessageProcessor;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import javax.sql.DataSource;
+import org.apache.camel.Processor;
 import org.apache.camel.BeanInject;
 import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePattern;
@@ -10,18 +18,37 @@ import org.apache.camel.Predicate;
 import org.apache.camel.PropertyInject;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.smpp.SmppException;
+import org.apache.camel.component.sql.SqlComponent;
 import org.apache.camel.model.rest.RestBindingMode;
 import org.apache.camel.model.rest.RestParamType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
 @Component
 public class SmsNotificationRouter extends RouteBuilder {
 
+//	@Autowired
+//	DataSource dataSource;
+//	
 	@BeanInject
 	private MessageProcessor messageProcessor;
-	
+//	
+//	public DataSource getDataSource() {
+//		return dataSource;
+//	}
+//
+//	public void setDataSource(DataSource dataSource) {
+//		this.dataSource = dataSource;
+//	}
+//	
+	@Bean
+	public SqlComponent sql(DataSource dataSource) {
+		SqlComponent sql = new SqlComponent();
+		sql.setDataSource(dataSource);
+		return sql;
+	}
 
 	@PropertyInject(value = "local.country", defaultValue = "IN")
 	private String localCountry="IN";
@@ -56,11 +83,28 @@ public class SmsNotificationRouter extends RouteBuilder {
 		
 		restConfiguration().component("servlet").bindingMode(RestBindingMode.json);
 
-		rest("/message")
-				.post("/add").consumes(MediaType.APPLICATION_JSON_VALUE).type(Message.class).outType(Message.class)
-				.to("seda:newMessage");
+//		rest("/message")
+//				.post("/add").consumes(MediaType.APPLICATION_JSON_VALUE).type(Message.class).outType(Message.class)
+//				.to("seda:newMessage");
 
 
+		from("direct:select").to("sql:select * from clients where status = 1").process(new Processor() {
+			public void process(Exchange xchg) throws Exception {
+			//the camel sql select query has been executed. We get the list of employees.
+				ArrayList<Map<String, String>> dataList = (ArrayList<Map<String, String>>) xchg.getIn().getBody();
+				List<Clients> list = new ArrayList<Clients>();
+				System.out.println(dataList);
+				for (Map<String, String> data : dataList) {
+					Clients c = new Clients();
+					c.setId(Integer.parseInt(data.get("id")));
+					c.setSender_details(data.get("sender_details"));
+					list.add(c);
+				}
+				xchg.getIn().setBody(list);
+			}
+		});
+	
+		
 		from("seda:newMessage?concurrentConsumers=20").routeId("smpp-sender").process(messageProcessor)
 				.setHeader("CamelSmppDestAddr",simple("91${in.body.sender}"))
 				.setBody(simple("${in.body.messageBody}"))

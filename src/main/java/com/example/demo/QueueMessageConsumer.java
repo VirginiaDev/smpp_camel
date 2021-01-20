@@ -35,28 +35,20 @@ import com.example.demo.dto.Clients;
 
 public class QueueMessageConsumer implements MessageListener{
 
-	private String activeMqBrokerUri;
-	    private String username;
-	    private String password;
 	    private String destinationName;
-	    private ActiveMQConnection connection;
 	 
-	    public QueueMessageConsumer(String activeMqBrokerUri, String username, String password) {
-	        super();
-	        this.activeMqBrokerUri = activeMqBrokerUri;
-	        this.username = username;
-	        this.password = password;
+	    public QueueMessageConsumer() {
 	    }
 	    
 	    
 	    class Sender implements Runnable {
 
-	        private final Connection connection;
-	        Destination destination;
+//	        private final Connection connection;
+//	        Destination destination;
 
-	        Sender(Connection connection) {
+	        Sender(/*Connection connection*/) {
 	        	System.out.println("1111111==========================");
-	            this.connection = connection;
+//	            this.connection = connection;
 	        }
 
 	        public void run() {
@@ -121,8 +113,8 @@ public class QueueMessageConsumer implements MessageListener{
 	 
 	    public void run() throws JMSException {
 	    	
-	        ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(username, password, activeMqBrokerUri);
-    	    PooledConnectionFactory pooledFactory = new PooledConnectionFactory(factory);
+//	        ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(username, password, activeMqBrokerUri);
+//    	    PooledConnectionFactory pooledFactory = new PooledConnectionFactory(factory);
     	    ScheduledExecutorService service =
     	    	    Executors.newSingleThreadScheduledExecutor();
 
@@ -130,7 +122,7 @@ public class QueueMessageConsumer implements MessageListener{
 	    	for (int i = 0; i < 1; ++i) {
 	    		
 	    	    //service.execute(new Sender(pooledFactory.createConnection()));
-	    		service.scheduleAtFixedRate(new Sender(pooledFactory.createConnection()), 0, 10, TimeUnit.SECONDS);
+	    		service.scheduleAtFixedRate(new Sender(/*pooledFactory.createConnection()*/), 0, 10, TimeUnit.SECONDS);
     	    }
 	    	    
 //	        System.out.println("Sessio=============================================="+session);

@@ -6,6 +6,42 @@ public class Clients {
 	private String message;
 	private String submission_date;
 	private String contacts;
+	private String ipAddress;
+	private String txPort;
+	private String systemId;
+	private String password;
+	private String systemType;
+	
+	public String getIpAddress() {
+		return ipAddress;
+	}
+	public void setIpAddress(String ipAddress) {
+		this.ipAddress = ipAddress;
+	}
+	public String getTxPort() {
+		return txPort;
+	}
+	public void setTxPort(String txPort) {
+		this.txPort = txPort;
+	}
+	public String getSystemId() {
+		return systemId;
+	}
+	public void setSystemId(String systemId) {
+		this.systemId = systemId;
+	}
+	public String getPassword() {
+		return password;
+	}
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	public String getSystemType() {
+		return systemType;
+	}
+	public void setSystemType(String systemType) {
+		this.systemType = systemType;
+	}
 	public int getId() {
 		return id;
 	}
